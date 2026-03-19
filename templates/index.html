@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PGSR – Restaurante Donde Siempre</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg:       #0d0f14;
+  --surface:  #161820;
+  --surface2: #1e2130;
+  --border:   #2a2d3e;
+  --accent:   #f5a623;
+  --accent2:  #e8502a;
+  --green:    #2ecc71;
+  --red:      #e74c3c;
+  --blue:     #3498db;
+  --text:     #e8eaf0;
+  --muted:    #7a7f9a;
+  --radius:   14px;
+  --shadow:   0 8px 32px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+
+/* SIDEBAR */
+#sidebar{width:260px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;transition:.3s}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--accent);line-height:1.2}
+.sidebar-logo p{color:var(--muted);font-size:.75rem;margin-top:4px}
+.sidebar-logo span{font-size:.65rem;background:var(--accent2);color:#fff;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:6px}
+nav{flex:1;padding:16px 12px;overflow-y:auto}
+nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:.88rem;font-weight:500;transition:.2s;margin-bottom:2px;cursor:pointer}
+nav a:hover{background:var(--surface2);color:var(--text)}
+nav a.active{background:linear-gradient(135deg,rgba(245,166,35,.15),rgba(232,80,42,.1));color:var(--accent);border:1px solid rgba(245,166,35,.2)}
+nav a i{width:20px;text-align:center;font-size:.95rem}
+.nav-section{color:var(--muted);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:16px 14px 6px}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.sidebar-footer button{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:10px;color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;transition:.2s}
+.sidebar-footer button:hover{opacity:.85}
+
+/* MAIN */
+#main{margin-left:260px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+#topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+#topbar h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+#status-badge{font-size:.78rem;padding:6px 14px;border-radius:20px;background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.3)}
+
+/* CONTENT */
+#content{padding:28px 32px;flex:1}
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;margin-bottom:28px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;transition:.2s}
+.kpi:hover{border-color:var(--accent);transform:translateY(-2px)}
+.kpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:1.1rem}
+.kpi-val{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--accent);line-height:1}
+.kpi-label{color:var(--muted);font-size:.8rem;margin-top:6px}
+
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.chart-card h3{font-size:.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px}
+.chart-card canvas{max-height:220px}
+
+/* TABLES */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.table-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.table-header h3{font-size:1rem;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{padding:12px 18px;text-align:left;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+td{padding:12px 18px;font-size:.88rem;border-bottom:1px solid rgba(42,45,62,.6);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.73rem;font-weight:600}
+.badge-green{background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.3)}
+.badge-red{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3)}
+.badge-blue{background:rgba(52,152,219,.15);color:var(--blue);border:1px solid rgba(52,152,219,.3)}
+.badge-orange{background:rgba(245,166,35,.15);color:var(--accent);border:1px solid rgba(245,166,35,.3)}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border:none;border-radius:9px;cursor:pointer;font-size:.85rem;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3)}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sm{padding:5px 12px;font-size:.78rem}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px;width:520px;max-width:90vw;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow);animation:modalIn .25s ease}
+@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:22px;color:var(--accent)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;transition:.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+
+/* NOMINA CARD */
+.nomina-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-top:16px}
+.nomina-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,45,62,.5);font-size:.9rem}
+.nomina-row:last-child{border-bottom:none}
+.nomina-row.total{font-weight:700;font-size:1.05rem;color:var(--green);margin-top:8px;padding-top:12px;border-top:2px solid var(--border);border-bottom:none}
+.nomina-row.deducc{color:var(--red)}
+.nomina-row.emp{color:var(--accent)}
+
+/* PROMO CARDS */
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.promo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:.2s}
+.promo-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.promo-card h4{font-weight:600;margin-bottom:4px}
+.promo-card p{color:var(--muted);font-size:.82rem;margin-bottom:12px}
+.promo-badge{display:inline-block;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:600;margin:3px 3px 3px 0}
+.promo-gold{background:rgba(255,215,0,.15);color:#ffd700;border:1px solid rgba(255,215,0,.3)}
+.promo-silver{background:rgba(192,192,192,.15);color:#c0c0c0;border:1px solid rgba(192,192,192,.3)}
+.promo-bronze{background:rgba(205,127,50,.15);color:#cd7f32;border:1px solid rgba(205,127,50,.3)}
+.promo-birthday{background:rgba(255,100,150,.15);color:#ff6496;border:1px solid rgba(255,100,150,.3)}
+.promo-vip{background:rgba(150,50,255,.15);color:#9632ff;border:1px solid rgba(150,50,255,.3)}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-item{background:var(--surface2);border-radius:10px;padding:16px;text-align:center}
+.stat-item .val{font-size:1.5rem;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif}
+.stat-item .lbl{font-size:.75rem;color:var(--muted);margin-top:4px}
+
+/* ALERT */
+.alert{padding:12px 16px;border-radius:10px;font-size:.85rem;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.alert-warn{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);color:var(--accent)}
+.alert-danger{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:var(--red)}
+.alert-ok{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);color:var(--green)}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.88rem;box-shadow:var(--shadow);z-index:9999;transform:translateY(20px);opacity:0;transition:.3s;max-width:320px}
+#toast.show{transform:translateY(0);opacity:1}
+
+/* LOADING */
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MESA GRID */
+.mesa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.mesa-tile{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;transition:.2s}
+.mesa-tile:hover{transform:translateY(-3px)}
+.mesa-tile.libre{border-color:var(--green)}
+.mesa-tile.ocupada{border-color:var(--red)}
+.mesa-tile i{font-size:2rem;margin-bottom:8px;display:block}
+.mesa-tile.libre i{color:var(--green)}
+.mesa-tile.ocupada i{color:var(--red)}
+.mesa-tile strong{display:block;font-size:1rem;margin-bottom:2px}
+.mesa-tile span{font-size:.75rem;color:var(--muted)}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px;color:var(--muted)}
+.empty i{font-size:3rem;margin-bottom:12px;display:block;opacity:.3}
+
+/* TOP BAR actions */
+.page-actions{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.page-actions h2{font-family:'Playfair Display',serif;font-size:1.5rem;flex:1}
+
+@media(max-width:900px){
+  #sidebar{width:200px}
+  #main{margin-left:200px}
+  .charts-grid{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <h1>🍽 Donde Siempre</h1>
+    <p>Gestión de Restaurante</p>
+    <span>UPC · Grupo 10</span>
+  </div>
+  <nav>
+    <div class="nav-section">Principal</div>
+    <a class="active" onclick="showPage('dashboard')"><i class="fas fa-chart-line"></i>Dashboard</a>
+    <a onclick="showPage('pedidos')"><i class="fas fa-receipt"></i>Pedidos</a>
+    <a onclick="showPage('mesas')"><i class="fas fa-chair"></i>Mesas</a>
+    <a onclick="showPage('reservas')"><i class="fas fa-calendar-check"></i>Reservas</a>
+
+    <div class="nav-section">Inventario</div>
+    <a onclick="showPage('productos')"><i class="fas fa-boxes"></i>Productos</a>
+    <a onclick="showPage('platos')"><i class="fas fa-utensils"></i>Carta / Platos</a>
+    <a onclick="showPage('proveedores')"><i class="fas fa-truck"></i>Proveedores</a>
+
+    <div class="nav-section">Recursos Humanos</div>
+    <a onclick="showPage('empleados')"><i class="fas fa-users"></i>Empleados</a>
+    <a onclick="showPage('nomina')"><i class="fas fa-money-bill-wave"></i>Nómina</a>
+
+    <div class="nav-section">Finanzas & CRM</div>
+    <a onclick="showPage('finanzas')"><i class="fas fa-landmark"></i>Finanzas</a>
+    <a onclick="showPage('clientes')"><i class="fas fa-star"></i>Clientes</a>
+    <a onclick="showPage('promociones')"><i class="fas fa-tags"></i>Promociones</a>
+
+    <div class="nav-section">Herramientas</div>
+    <a onclick="showPage('simulacion')"><i class="fas fa-dice"></i>Simulación</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button onclick="guardarDatos()"><i class="fas fa-save"></i> Guardar datos</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+  <div id="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="topbar-right">
+      <span id="status-badge"><i class="fas fa-circle" style="font-size:.5rem"></i> Sistema activo</span>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="page-dashboard" class="page active">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3><i class="fas fa-chart-bar" style="color:var(--accent);margin-right:6px"></i>Ventas por día</h3>
+          <canvas id="chart-ventas"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3><i class="fas fa-fire" style="color:var(--accent2);margin-right:6px"></i>Top platos</h3>
+          <canvas id="chart-platos"></canvas>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="table-card">
+          <div class="table-header"><h3>📊 Estadísticas de ventas</h3></div>
+          <div style="padding:20px" id="stats-box"></div>
+        </div>
+        <div class="table-card">
+          <div class="table-header"><h3>⚠ Inventario crítico</h3></div>
+          <div style="padding:20px" id="criticos-box"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTOS ── -->
+    <div id="page-productos" class="page">
+      <div class="page-actions">
+        <h2>Inventario de Productos</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-producto')"><i class="fas fa-plus"></i>Nuevo producto</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Stock</th><th>Unidad</th><th>Costo</th><th>Mínimo</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-productos"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── PLATOS ── -->
+    <div id="page-platos" class="page">
+      <div class="page-actions">
+        <h2>Carta de Platos</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-plato')"><i class="fas fa-plus"></i>Nuevo plato</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio venta</th><th>Descripción</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-platos"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── PROVEEDORES ── -->
+    <div id="page-proveedores" class="page">
+      <div class="page-actions">
+        <h2>Proveedores</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-proveedor')"><i class="fas fa-plus"></i>Nuevo proveedor</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Nombre</th><th>NIT</th><th>Ciudad</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-proveedores"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── PEDIDOS ── -->
+    <div id="page-pedidos" class="page">
+      <div class="page-actions">
+        <h2>Pedidos</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-pedido')"><i class="fas fa-plus"></i>Nuevo pedido</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Tipo</th><th>Mesa</th><th>Mesero</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-pedidos"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── MESAS ── -->
+    <div id="page-mesas" class="page">
+      <div class="page-actions">
+        <h2>Mesas del Restaurante</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-mesa')"><i class="fas fa-plus"></i>Nueva mesa</button>
+      </div>
+      <div class="mesa-grid" id="mesa-grid"></div>
+    </div>
+
+    <!-- ── RESERVAS ── -->
+    <div id="page-reservas" class="page">
+      <div class="page-actions">
+        <h2>Reservas</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-reserva')"><i class="fas fa-plus"></i>Nueva reserva</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Cliente</th><th>Fecha</th><th>Hora</th><th>Pax</th><th>Notas</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-reservas"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── EMPLEADOS ── -->
+    <div id="page-empleados" class="page">
+      <div class="page-actions">
+        <h2>Empleados</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-empleado')"><i class="fas fa-plus"></i>Nuevo empleado</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Nombre</th><th>Cargo</th><th>Salario base</th><th>Teléfono</th><th>F. ingreso</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-empleados"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── NÓMINA ── -->
+    <div id="page-nomina" class="page">
+      <div class="page-actions"><h2>Liquidación de Nómina</h2></div>
+      <div class="alert alert-warn"><i class="fas fa-info-circle"></i>Cálculos según normatividad colombiana vigente 2025 – Ministerio de Trabajo</div>
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:20px">
+        <div class="table-card" style="height:fit-content">
+          <div class="table-header"><h3>Seleccionar empleado</h3></div>
+          <div style="padding:14px" id="lista-empleados-nomina"></div>
+        </div>
+        <div id="nomina-resultado">
+          <div class="empty"><i class="fas fa-file-invoice-dollar"></i><p>Selecciona un empleado para calcular su nómina</p></div>
+        </div>
+      </div>
+      <div class="table-card" style="margin-top:20px">
+        <div class="table-header"><h3>Historial de nóminas</h3></div>
+        <table><thead><tr><th>ID</th><th>Empleado</th><th>Mes</th><th>Devengado</th><th>Deducciones</th><th>Neto a pagar</th><th>Costo empresa</th></tr></thead>
+        <tbody id="tb-nominas"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── FINANZAS ── -->
+    <div id="page-finanzas" class="page">
+      <div class="page-actions">
+        <h2>Cuentas Financieras</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-finanza')"><i class="fas fa-plus"></i>Nuevo movimiento</button>
+      </div>
+      <div class="kpi-grid" id="kpi-finanzas"></div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Tipo</th><th>Concepto</th><th>Monto</th><th>Fecha</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-finanzas"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── CLIENTES ── -->
+    <div id="page-clientes" class="page">
+      <div class="page-actions">
+        <h2>Clientes Frecuentes</h2>
+        <button class="btn btn-primary" onclick="openModal('modal-cliente')"><i class="fas fa-plus"></i>Nuevo cliente</button>
+      </div>
+      <div class="table-card">
+        <table><thead><tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Puntos</th><th>Cumpleaños</th><th>Acciones</th></tr></thead>
+        <tbody id="tb-clientes"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ── PROMOCIONES ── -->
+    <div id="page-promociones" class="page">
+      <div class="page-actions">
+        <h2>Planes Promocionales</h2>
+        <button class="btn btn-primary" onclick="loadPromociones()"><i class="fas fa-sync"></i>Calcular</button>
+      </div>
+      <div class="promo-grid" id="promo-grid">
+        <div class="empty"><i class="fas fa-tags"></i><p>Presiona "Calcular" para generar planes</p></div>
+      </div>
+    </div>
+
+    <!-- ── SIMULACIÓN ── -->
+    <div id="page-simulacion" class="page">
+      <div class="page-actions"><h2>Simulación Aleatoria</h2></div>
+      <div style="max-width:540px">
+        <div class="table-card" style="padding:28px">
+          <h3 style="margin-bottom:6px;font-size:1.1rem">Generador de datos de prueba</h3>
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:22px">Simula la operación del restaurante por N días usando números aleatorios. Crea pedidos, ventas y gastos ficticios para probar el sistema.</p>
+          <div class="form-group">
+            <label>Días a simular</label>
+            <input type="range" id="sim-dias" min="1" max="30" value="7" oninput="document.getElementById('sim-dias-val').textContent=this.value" style="width:100%;accent-color:var(--accent)">
+            <div style="text-align:center;margin-top:8px"><span id="sim-dias-val" style="font-size:2rem;font-weight:700;color:var(--accent);font-family:'Playfair Display',serif">7</span> días</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px" onclick="ejecutarSimulacion()">
+            <i class="fas fa-dice"></i> Ejecutar simulación
+          </button>
+        </div>
+        <div id="sim-resultado" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-producto">
+  <div class="modal">
+    <h3><i class="fas fa-box" style="margin-right:10px;color:var(--accent)"></i>Nuevo Producto</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input id="p-nombre" placeholder="Ej: Pechuga de pollo"></div>
+      <div class="form-group"><label>Categoría</label>
+        <select id="p-categoria"><option>carne</option><option>vegetal</option><option>bebida</option><option>grano</option><option>lácteo</option><option>otro</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Unidad</label>
+        <select id="p-unidad"><option>kg</option><option>L</option><option>unidad</option><option>g</option><option>ml</option></select>
+      </div>
+      <div class="form-group"><label>Stock inicial</label><input id="p-stock" type="number" min="0" placeholder="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Precio costo unitario ($)</label><input id="p-costo" type="number" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Stock mínimo</label><input id="p-minimo" type="number" min="0" placeholder="5"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-producto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearProducto()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-plato">
+  <div class="modal">
+    <h3><i class="fas fa-utensils" style="margin-right:10px;color:var(--accent)"></i>Nuevo Plato</h3>
+    <div class="form-group"><label>Nombre del plato</label><input id="pl-nombre" placeholder="Ej: Bandeja Paisa"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Categoría</label>
+        <select id="pl-categoria"><option>entrada</option><option>principal</option><option>postre</option><option>bebida</option><option>ensalada</option></select>
+      </div>
+      <div class="form-group"><label>Precio de venta ($)</label><input id="pl-precio" type="number" min="0" placeholder="25000"></div>
+    </div>
+    <div class="form-group"><label>Descripción</label><textarea id="pl-desc" rows="2" placeholder="Descripción del plato..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-plato')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearPlato()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-proveedor">
+  <div class="modal">
+    <h3><i class="fas fa-truck" style="margin-right:10px;color:var(--accent)"></i>Nuevo Proveedor</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre/Razón social</label><input id="pv-nombre" placeholder="Ej: Carnes el Toro"></div>
+      <div class="form-group"><label>NIT/Cédula</label><input id="pv-nit" placeholder="900123456-1"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Teléfono</label><input id="pv-tel" placeholder="3001234567"></div>
+      <div class="form-group"><label>Ciudad</label><input id="pv-ciudad" placeholder="Valledupar"></div>
+    </div>
+    <div class="form-group"><label>Email</label><input id="pv-email" type="email" placeholder="proveedor@email.com"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-proveedor')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearProveedor()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-pedido">
+  <div class="modal">
+    <h3><i class="fas fa-receipt" style="margin-right:10px;color:var(--accent)"></i>Nuevo Pedido</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Tipo</label>
+        <select id="ped-tipo"><option value="local">Local</option><option value="domicilio">Domicilio</option></select>
+      </div>
+      <div class="form-group"><label>Mesa (si es local)</label>
+        <select id="ped-mesa"><option value="">Sin mesa</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Mesero</label>
+        <select id="ped-mesero"><option value="">Sin mesero</option></select>
+      </div>
+      <div class="form-group"><label>Cliente</label>
+        <select id="ped-cliente"><option value="">Anónimo</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Platos</label>
+      <div id="ped-items"></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="agregarItemPedido()"><i class="fas fa-plus"></i>Agregar plato</button>
+    </div>
+    <div style="text-align:right;font-size:1.1rem;font-weight:700;color:var(--accent);margin-top:12px">Total: $<span id="ped-total">0</span></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pedido')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearPedido()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-mesa">
+  <div class="modal">
+    <h3><i class="fas fa-chair" style="margin-right:10px;color:var(--accent)"></i>Nueva Mesa</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Número/Nombre</label><input id="m-numero" placeholder="Ej: 1, VIP, Terraza 2"></div>
+      <div class="form-group"><label>Capacidad</label><input id="m-cap" type="number" min="1" max="20" placeholder="4"></div>
+    </div>
+    <div class="form-group"><label>Zona</label>
+      <select id="m-zona"><option>interior</option><option>exterior</option><option>terraza</option><option>bar</option><option>privado</option></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-mesa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearMesa()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-reserva">
+  <div class="modal">
+    <h3><i class="fas fa-calendar-check" style="margin-right:10px;color:var(--accent)"></i>Nueva Reserva</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre del cliente</label><input id="r-nombre" placeholder="Nombre completo"></div>
+      <div class="form-group"><label>Teléfono</label><input id="r-tel" placeholder="3001234567"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha</label><input id="r-fecha" type="date"></div>
+      <div class="form-group"><label>Hora</label><input id="r-hora" type="time" value="12:00"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Comensales</label><input id="r-comens" type="number" min="1" value="2"></div>
+      <div class="form-group"><label>Mesa</label>
+        <select id="r-mesa"><option value="">Sin preferencia</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Solicitudes especiales</label><textarea id="r-notas" rows="2" placeholder="Cumpleaños, alergias, etc."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-reserva')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearReserva()"><i class="fas fa-save"></i>Reservar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-empleado">
+  <div class="modal">
+    <h3><i class="fas fa-user-tie" style="margin-right:10px;color:var(--accent)"></i>Nuevo Empleado</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre completo</label><input id="e-nombre" placeholder="Nombre completo"></div>
+      <div class="form-group"><label>Cédula</label><input id="e-cedula" placeholder="Número de cédula"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Cargo</label>
+        <select id="e-cargo"><option>mesero</option><option>cocinero</option><option>cajero</option><option>administrador</option><option>domiciliario</option><option>auxiliar</option></select>
+      </div>
+      <div class="form-group"><label>Salario base ($)</label><input id="e-salario" type="number" min="1423500" value="1423500" placeholder="1423500"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Teléfono</label><input id="e-tel" placeholder="3001234567"></div>
+      <div class="form-group"><label>Email</label><input id="e-email" type="email" placeholder="email@ejemplo.com"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Banco</label><input id="e-banco" placeholder="Bancolombia"></div>
+      <div class="form-group"><label>Cuenta bancaria</label><input id="e-cuenta" placeholder="Número de cuenta"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-empleado')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearEmpleado()"><i class="fas fa-save"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-finanza">
+  <div class="modal">
+    <h3><i class="fas fa-landmark" style="margin-right:10px;color:var(--accent)"></i>Nuevo Movimiento</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Tipo</label>
+        <select id="f-tipo"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select>
+      </div>
+      <div class="form-group"><label>Monto ($)</label><input id="f-monto" type="number" min="0" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label>Concepto</label><input id="f-concepto" placeholder="Descripción del movimiento"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-finanza')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearFinanza()"><i class="fas fa-save"></i>Registrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <h3><i class="fas fa-user" style="margin-right:10px;color:var(--accent)"></i>Nuevo Cliente</h3>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre</label><input id="c-nombre" placeholder="Nombre completo"></div>
+      <div class="form-group"><label>Teléfono</label><input id="c-tel" placeholder="3001234567"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input id="c-email" type="email" placeholder="email@ejemplo.com"></div>
+      <div class="form-group"><label>Cumpleaños (MM-DD)</label><input id="c-cumple" placeholder="03-15"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="crearCliente()"><i class="fas fa-save"></i>Registrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = v => '$' + Math.round(v).toLocaleString('es-CO');
+let chartVentas = null, chartPlatos = null;
+let platosCache = [], mesasCache = [], empleadosCache = [], clientesCache = [];
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  $(`page-${name}`).classList.add('active');
+  event?.target?.closest('a')?.classList?.add('active');
+  const titles = {dashboard:'Dashboard',pedidos:'Pedidos',mesas:'Mesas',
+    reservas:'Reservas',productos:'Inventario de Productos',platos:'Carta de Platos',
+    proveedores:'Proveedores',empleados:'Empleados',nomina:'Nómina',
+    finanzas:'Finanzas',clientes:'Clientes',promociones:'Promociones',simulacion:'Simulación'};
+  $('page-title').textContent = titles[name] || name;
+  const loaders = {
+    dashboard: loadDashboard, productos: loadProductos, platos: loadPlatos,
+    proveedores: loadProveedores, pedidos: loadPedidos, mesas: loadMesas,
+    reservas: loadReservas, empleados: loadEmpleados, nomina: loadNomina,
+    finanzas: loadFinanzas, clientes: loadClientes,
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg, type='ok') {
+  const t=$('toast');
+  t.innerHTML = `<i class="fas fa-${type==='ok'?'check-circle':'exclamation-circle'}" 
+    style="color:var(--${type==='ok'?'green':'red'});margin-right:8px"></i>${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  if (id==='modal-pedido') prepModalPedido();
+  if (id==='modal-reserva') prepModalReserva();
+  $(id).classList.add('open');
+}
+function closeModal(id) { $(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const d = await fetch('/api/dashboard').then(r=>r.json());
+  
+  const kpis = [
+    {icon:'fa-receipt',color:'#f5a623',label:'Total pedidos',val:d.kpis.total_pedidos},
+    {icon:'fa-check-circle',color:'#2ecc71',label:'Pedidos cerrados',val:d.kpis.pedidos_cerrados},
+    {icon:'fa-arrow-up',color:'#2ecc71',label:'Ingresos totales',val:fmt(d.kpis.ingresos_totales)},
+    {icon:'fa-arrow-down',color:'#e74c3c',label:'Egresos totales',val:fmt(d.kpis.egresos_totales)},
+    {icon:'fa-balance-scale',color:d.kpis.saldo>=0?'#2ecc71':'#e74c3c',label:'Saldo neto',val:fmt(d.kpis.saldo)},
+    {icon:'fa-users',color:'#3498db',label:'Empleados activos',val:d.kpis.empleados_activos},
+    {icon:'fa-chair',color:'#9b59b6',label:'Mesas libres',val:d.kpis.mesas_libres},
+    {icon:'fa-exclamation-triangle',color:'#e74c3c',label:'Productos críticos',val:d.kpis.productos_criticos},
+  ];
+  $('kpi-grid').innerHTML = kpis.map(k=>`
+    <div class="kpi">
+      <div class="kpi-icon" style="background:${k.color}22"><i class="fas ${k.icon}" style="color:${k.color}"></i></div>
+      <div class="kpi-val" style="color:${k.color}">${k.val}</div>
+      <div class="kpi-label">${k.label}</div>
+    </div>`).join('');
+
+  // Charts
+  if(chartVentas){chartVentas.destroy();chartVentas=null}
+  if(chartPlatos){chartPlatos.destroy();chartPlatos=null}
+  
+  const ctxV = $('chart-ventas').getContext('2d');
+  chartVentas = new Chart(ctxV, {type:'bar',data:{
+    labels: d.ventas_dia.map(x=>x.fecha.slice(5)),
+    datasets:[{label:'Ventas',data:d.ventas_dia.map(x=>x.total),
+      backgroundColor:'rgba(245,166,35,.3)',borderColor:'#f5a623',borderWidth:2,borderRadius:6}]
+  },options:{responsive:true,plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>fmt(v)},grid:{color:'rgba(255,255,255,.05)'}},
+            x:{grid:{display:false}}}}});
+  
+  const ctxP = $('chart-platos').getContext('2d');
+  chartPlatos = new Chart(ctxP, {type:'doughnut',data:{
+    labels: d.top_platos.map(x=>x.nombre),
+    datasets:[{data:d.top_platos.map(x=>x.cantidad),
+      backgroundColor:['#f5a623','#e8502a','#2ecc71','#3498db','#9b59b6'],
+      borderWidth:0}]
+  },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:'#7a7f9a',font:{size:11}}}}}});
+
+  // Stats
+  const st = d.estadisticas;
+  $('stats-box').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-item"><div class="val">${fmt(st.media)}</div><div class="lbl">Media/pedido</div></div>
+      <div class="stat-item"><div class="val">${fmt(st.mediana)}</div><div class="lbl">Mediana</div></div>
+      <div class="stat-item"><div class="val">${fmt(st.desv_std)}</div><div class="lbl">Desv. estándar</div></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <div class="stat-item" style="flex:1"><div class="val" style="color:var(--green)">${fmt(st.maximo)}</div><div class="lbl">Máximo</div></div>
+      <div class="stat-item" style="flex:1"><div class="val" style="color:var(--red)">${fmt(st.minimo)}</div><div class="lbl">Mínimo</div></div>
+    </div>`;
+  
+  // Críticos
+  if(d.criticos.length===0) {
+    $('criticos-box').innerHTML='<div class="alert alert-ok"><i class="fas fa-check-circle"></i>Todos los productos sobre stock mínimo</div>';
+  } else {
+    $('criticos-box').innerHTML=d.criticos.map(c=>`
+      <div class="alert alert-danger" style="margin-bottom:8px">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div><strong>${c.nombre}</strong><br><small>Stock: ${c.stock} / Mínimo: ${c.minimo}</small></div>
+      </div>`).join('');
+  }
+}
+
+// ── PRODUCTOS ────────────────────────────────────────────────────────────────
+async function loadProductos() {
+  const data = await fetch('/api/productos').then(r=>r.json());
+  $('tb-productos').innerHTML = data.length===0
+    ? '<tr><td colspan="8"><div class="empty"><i class="fas fa-boxes"></i><p>Sin productos</p></div></td></tr>'
+    : data.map(p=>`<tr>
+      <td><code style="color:var(--muted);font-size:.78rem">${p.id}</code></td>
+      <td><strong>${p.nombre}</strong></td>
+      <td><span class="badge badge-blue">${p.categoria}</span></td>
+      <td><span style="color:${p.stock<p.stock_minimo?'var(--red)':'var(--green)'}">${p.stock}</span></td>
+      <td>${p.unidad}</td>
+      <td>${fmt(p.precio_costo)}</td>
+      <td>${p.stock_minimo}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('productos','${p.id}',loadProductos)"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+async function crearProducto() {
+  const body = {nombre:$('p-nombre').value,categoria:$('p-categoria').value,
+    unidad:$('p-unidad').value,stock:$('p-stock').value,
+    precio_costo:$('p-costo').value,stock_minimo:$('p-minimo').value};
+  if(!body.nombre){toast('Nombre requerido','err');return}
+  await fetch('/api/productos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-producto'); toast('Producto creado'); loadProductos();
+}
+
+// ── PLATOS ───────────────────────────────────────────────────────────────────
+async function loadPlatos() {
+  const data = await fetch('/api/platos').then(r=>r.json());
+  platosCache = data;
+  $('tb-platos').innerHTML = data.length===0
+    ? '<tr><td colspan="6"><div class="empty"><i class="fas fa-utensils"></i><p>Sin platos</p></div></td></tr>'
+    : data.map(p=>`<tr>
+      <td><code style="color:var(--muted);font-size:.78rem">${p.id}</code></td>
+      <td><strong>${p.nombre}</strong></td>
+      <td><span class="badge badge-orange">${p.categoria}</span></td>
+      <td style="color:var(--green);font-weight:600">${fmt(p.precio_venta)}</td>
+      <td style="color:var(--muted);font-size:.82rem">${p.descripcion||'—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('platos','${p.id}',loadPlatos)"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+async function crearPlato() {
+  const body={nombre:$('pl-nombre').value,categoria:$('pl-categoria').value,
+    precio_venta:$('pl-precio').value,descripcion:$('pl-desc').value};
+  if(!body.nombre){toast('Nombre requerido','err');return}
+  await fetch('/api/platos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-plato'); toast('Plato creado'); loadPlatos();
+}
+
+// ── PROVEEDORES ──────────────────────────────────────────────────────────────
+async function loadProveedores() {
+  const data = await fetch('/api/proveedores').then(r=>r.json());
+  $('tb-proveedores').innerHTML = data.length===0
+    ? '<tr><td colspan="7"><div class="empty"><i class="fas fa-truck"></i><p>Sin proveedores</p></div></td></tr>'
+    : data.map(p=>`<tr>
+      <td><code style="color:var(--muted);font-size:.78rem">${p.id}</code></td>
+      <td><strong>${p.nombre}</strong></td><td>${p.nit}</td>
+      <td>${p.ciudad}</td><td>${p.telefono}</td><td>${p.email}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('proveedores','${p.id}',loadProveedores)"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+async function crearProveedor() {
+  const body={nombre:$('pv-nombre').value,nit:$('pv-nit').value,
+    telefono:$('pv-tel').value,ciudad:$('pv-ciudad').value,email:$('pv-email').value};
+  if(!body.nombre){toast('Nombre requerido','err');return}
+  await fetch('/api/proveedores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-proveedor'); toast('Proveedor creado'); loadProveedores();
+}
+
+// ── PEDIDOS ──────────────────────────────────────────────────────────────────
+let pedidoItems = [];
+function prepModalPedido() {
+  pedidoItems=[];
+  $('ped-items').innerHTML='';
+  $('ped-total').textContent='0';
+  fetch('/api/mesas').then(r=>r.json()).then(ms=>{
+    mesasCache=ms;
+    $('ped-mesa').innerHTML='<option value="">Sin mesa</option>'+
+      ms.map(m=>`<option value="${m.id}">Mesa ${m.numero} (${m.zona})</option>`).join('');
+  });
+  fetch('/api/empleados').then(r=>r.json()).then(es=>{
+    empleadosCache=es;
+    $('ped-mesero').innerHTML='<option value="">Sin mesero</option>'+
+      es.filter(e=>e.cargo==='mesero'||e.cargo==='cajero')
+        .map(e=>`<option value="${e.id}">${e.nombre}</option>`).join('');
+  });
+  fetch('/api/clientes').then(r=>r.json()).then(cs=>{
+    clientesCache=cs;
+    $('ped-cliente').innerHTML='<option value="">Anónimo</option>'+
+      cs.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  });
+  fetch('/api/platos').then(r=>r.json()).then(ps=>{platosCache=ps});
+}
+
+function agregarItemPedido() {
+  const idx=pedidoItems.length;
+  pedidoItems.push({plato_id:'',cantidad:1,precio_unit:0});
+  const div=document.createElement('div');
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px;align-items:center';
+  div.innerHTML=`
+    <select onchange="setPlato(${idx},this)" style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text)">
+      <option value="">Seleccionar plato</option>
+      ${platosCache.map(p=>`<option value="${p.id}" data-precio="${p.precio_venta}">${p.nombre} - ${fmt(p.precio_venta)}</option>`).join('')}
+    </select>
+    <input type="number" min="1" value="1" onchange="setCant(${idx},this)" 
+      style="width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px;color:var(--text);text-align:center">
+    <button class="btn btn-danger btn-sm" onclick="quitarItem(${idx},this.parentElement)"><i class="fas fa-times"></i></button>`;
+  $('ped-items').appendChild(div);
+}
+function setPlato(idx,sel){
+  const opt=sel.options[sel.selectedIndex];
+  pedidoItems[idx].plato_id=sel.value;
+  pedidoItems[idx].precio_unit=parseFloat(opt.dataset.precio||0);
+  pedidoItems[idx].nombre=opt.text.split(' - ')[0];
+  calcTotal();
+}
+function setCant(idx,inp){pedidoItems[idx].cantidad=parseInt(inp.value)||1;calcTotal()}
+function quitarItem(idx,div){pedidoItems[idx]=null;div.remove();calcTotal()}
+function calcTotal(){
+  const t=pedidoItems.filter(Boolean).reduce((s,i)=>s+i.cantidad*i.precio_unit,0);
+  $('ped-total').textContent=Math.round(t).toLocaleString('es-CO');
+}
+
+async function crearPedido() {
+  const items=pedidoItems.filter(Boolean).filter(i=>i.plato_id);
+  if(!items.length){toast('Agrega al menos un plato','err');return}
+  const body={tipo:$('ped-tipo').value,mesa_id:$('ped-mesa').value,
+    mesero_id:$('ped-mesero').value,cliente_id:$('ped-cliente').value,items};
+  const r=await fetch('/api/pedidos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(x=>x.json());
+  closeModal('modal-pedido'); toast(`Pedido creado – Total: ${fmt(r.total)}`); loadPedidos();
+}
+
+async function loadPedidos() {
+  const data=await fetch('/api/pedidos').then(r=>r.json());
+  $('tb-pedidos').innerHTML=data.length===0
+    ? '<tr><td colspan="8"><div class="empty"><i class="fas fa-receipt"></i><p>Sin pedidos</p></div></td></tr>'
+    : data.slice(0,50).map(p=>{
+      const badgeCls=p.estado==='cerrado'?'badge-green':p.estado==='cancelado'?'badge-red':'badge-orange';
+      return `<tr>
+        <td><code style="font-size:.78rem;color:var(--muted)">${p.id}</code></td>
+        <td><span class="badge badge-blue">${p.tipo}</span></td>
+        <td>${p.mesa_id||'—'}</td><td>${p.mesero_id||'—'}</td>
+        <td style="font-weight:600;color:var(--accent)">${fmt(p.total)}</td>
+        <td><span class="badge ${badgeCls}">${p.estado}</span></td>
+        <td style="color:var(--muted);font-size:.8rem">${p.fecha?.slice(0,16)||''}</td>
+        <td>
+          ${p.estado==='abierto'?`<button class="btn btn-ghost btn-sm" onclick="cerrarPedido('${p.id}')"><i class="fas fa-check"></i></button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('pedidos','${p.id}',loadPedidos)"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>`;}).join('');
+}
+
+async function cerrarPedido(id){
+  await fetch(`/api/pedidos/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({estado:'cerrado'})});
+  toast('Pedido cerrado'); loadPedidos();
+}
+
+// ── MESAS ────────────────────────────────────────────────────────────────────
+async function loadMesas() {
+  const data=await fetch('/api/mesas').then(r=>r.json());
+  mesasCache=data;
+  if(!data.length){
+    $('mesa-grid').innerHTML='<div class="empty"><i class="fas fa-chair"></i><p>Sin mesas registradas</p></div>';
+    return;
+  }
+  $('mesa-grid').innerHTML=data.map(m=>`
+    <div class="mesa-tile ${m.estado}" onclick="toggleMesa('${m.id}','${m.estado}')">
+      <i class="fas fa-chair"></i>
+      <strong>Mesa ${m.numero}</strong>
+      <span>${m.capacidad} personas</span>
+      <span style="margin-top:4px">${m.zona}</span>
+      <span style="margin-top:6px;font-weight:600;color:${m.estado==='libre'?'var(--green)':'var(--red)'}">● ${m.estado}</span>
+    </div>`).join('');
+}
+
+async function toggleMesa(id,estado){
+  const nuevo=estado==='libre'?'ocupada':'libre';
+  await fetch(`/api/mesas/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({estado:nuevo})});
+  toast(`Mesa ${nuevo}`); loadMesas();
+}
+
+async function crearMesa(){
+  const body={numero:$('m-numero').value,capacidad:parseInt($('m-cap').value)||4,zona:$('m-zona').value};
+  if(!body.numero){toast('Número requerido','err');return}
+  await fetch('/api/mesas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-mesa'); toast('Mesa creada'); loadMesas();
+}
+
+// ── RESERVAS ─────────────────────────────────────────────────────────────────
+function prepModalReserva(){
+  fetch('/api/mesas').then(r=>r.json()).then(ms=>{
+    $('r-mesa').innerHTML='<option value="">Sin preferencia</option>'+
+      ms.map(m=>`<option value="${m.id}">Mesa ${m.numero}</option>`).join('');
+  });
+}
+
+async function loadReservas(){
+  const data=await fetch('/api/reservas').then(r=>r.json());
+  $('tb-reservas').innerHTML=data.length===0
+    ? '<tr><td colspan="8"><div class="empty"><i class="fas fa-calendar"></i><p>Sin reservas</p></div></td></tr>'
+    : data.sort((a,b)=>a.fecha>b.fecha?1:-1).map(r=>`<tr>
+      <td><code style="font-size:.78rem;color:var(--muted)">${r.id}</code></td>
+      <td><strong>${r.cliente_nombre}</strong><br><small style="color:var(--muted)">${r.telefono}</small></td>
+      <td>${r.fecha}</td><td>${r.hora}</td>
+      <td>${r.comensales} pax</td>
+      <td style="color:var(--muted);font-size:.82rem">${r.notas_especiales||'—'}</td>
+      <td><span class="badge ${r.estado==='confirmada'?'badge-green':'badge-red'}">${r.estado}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('reservas','${r.id}',loadReservas)"><i class="fas fa-times"></i></button></td>
+    </tr>`).join('');
+}
+
+async function crearReserva(){
+  const body={cliente_nombre:$('r-nombre').value,telefono:$('r-tel').value,
+    fecha:$('r-fecha').value,hora:$('r-hora').value,
+    comensales:parseInt($('r-comens').value)||2,
+    mesa:$('r-mesa').value,notas_especiales:$('r-notas').value};
+  if(!body.cliente_nombre||!body.fecha){toast('Nombre y fecha requeridos','err');return}
+  await fetch('/api/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-reserva'); toast('Reserva creada'); loadReservas();
+}
+
+// ── EMPLEADOS ────────────────────────────────────────────────────────────────
+async function loadEmpleados(){
+  const data=await fetch('/api/empleados').then(r=>r.json());
+  empleadosCache=data;
+  $('tb-empleados').innerHTML=data.length===0
+    ? '<tr><td colspan="7"><div class="empty"><i class="fas fa-users"></i><p>Sin empleados</p></div></td></tr>'
+    : data.map(e=>`<tr>
+      <td><code style="font-size:.78rem;color:var(--muted)">${e.id}</code></td>
+      <td><strong>${e.nombre}</strong><br><small style="color:var(--muted)">${e.cedula}</small></td>
+      <td><span class="badge badge-blue">${e.cargo}</span></td>
+      <td style="color:var(--green);font-weight:600">${fmt(e.salario_base)}</td>
+      <td>${e.telefono}</td><td>${e.fecha_ingreso||'—'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="verNomina('${e.id}')"><i class="fas fa-file-invoice-dollar"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('empleados','${e.id}',loadEmpleados)"><i class="fas fa-trash"></i></button>
+      </td>
+    </tr>`).join('');
+}
+
+async function crearEmpleado(){
+  const body={nombre:$('e-nombre').value,cedula:$('e-cedula').value,
+    cargo:$('e-cargo').value,salario_base:$('e-salario').value,
+    telefono:$('e-tel').value,email:$('e-email').value,
+    banco:$('e-banco').value,cuenta:$('e-cuenta').value};
+  if(!body.nombre){toast('Nombre requerido','err');return}
+  await fetch('/api/empleados',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-empleado'); toast('Empleado creado'); loadEmpleados();
+}
+
+// ── NÓMINA ───────────────────────────────────────────────────────────────────
+async function loadNomina(){
+  const emps=await fetch('/api/empleados').then(r=>r.json());
+  $('lista-empleados-nomina').innerHTML=emps.map(e=>`
+    <button class="btn btn-ghost" style="width:100%;margin-bottom:6px;justify-content:flex-start" onclick="verNomina('${e.id}')">
+      <i class="fas fa-user" style="color:var(--accent)"></i>
+      <div style="text-align:left"><div>${e.nombre}</div><div style="font-size:.75rem;color:var(--muted)">${e.cargo} · ${fmt(e.salario_base)}</div></div>
+    </button>`).join('');
+  const noms=await fetch('/api/nominas').then(r=>r.json());
+  $('tb-nominas').innerHTML=noms.length===0
+    ? '<tr><td colspan="7"><div class="empty"><i class="fas fa-file-invoice-dollar"></i><p>Sin nóminas liquidadas</p></div></td></tr>'
+    : noms.map(n=>`<tr>
+      <td><code style="font-size:.78rem;color:var(--muted)">${n.id}</code></td>
+      <td>${n.empleado_nombre}</td><td>${n.mes}</td>
+      <td>${fmt(n.devengado)}</td>
+      <td style="color:var(--red)">${fmt(n.deducciones)}</td>
+      <td style="color:var(--green);font-weight:700">${fmt(n.neto_pagar)}</td>
+      <td style="color:var(--accent)">${fmt(n.costo_empresa)}</td>
+    </tr>`).join('');
+}
+
+async function verNomina(eid){
+  showPage('nomina');
+  const n=await fetch(`/api/nomina/${eid}`).then(r=>r.json());
+  $('nomina-resultado').innerHTML=`
+    <div class="table-card" style="padding:24px">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:6px;color:var(--accent)">Desprendible de Nómina</h3>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px">${n.empleado_nombre} · ${n.mes}</p>
+      <div class="nomina-card">
+        <div class="nomina-row"><span>Salario base</span><span>${fmt(n.salario_base)}</span></div>
+        <div class="nomina-row"><span>Aux. transporte</span><span>${fmt(n.aux_transporte)}</span></div>
+        <div class="nomina-row" style="font-weight:600;color:var(--text)"><span>Total devengado</span><span>${fmt(n.devengado)}</span></div>
+        <div style="height:12px"></div>
+        <div class="nomina-row deducc"><span>(-) Salud empleado 4%</span><span>-${fmt(n.desc_salud)}</span></div>
+        <div class="nomina-row deducc"><span>(-) Pensión empleado 4%</span><span>-${fmt(n.desc_pension)}</span></div>
+        <div class="nomina-row total"><span>NETO A PAGAR</span><span>${fmt(n.neto_pagar)}</span></div>
+        <div style="height:16px;border-top:1px dashed var(--border);margin-top:8px;margin-bottom:8px"></div>
+        <p style="color:var(--muted);font-size:.78rem;margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Aportes empresa</p>
+        <div class="nomina-row emp"><span>Salud empleador 8.5%</span><span>${fmt(n.ap_salud_empr)}</span></div>
+        <div class="nomina-row emp"><span>Pensión empleador 12%</span><span>${fmt(n.ap_pension_empr)}</span></div>
+        <div class="nomina-row emp"><span>Cesantías 8.33%</span><span>${fmt(n.cesantias)}</span></div>
+        <div class="nomina-row emp"><span>Intereses cesantías 1%</span><span>${fmt(n.int_cesantias)}</span></div>
+        <div class="nomina-row emp"><span>Prima de servicios 8.33%</span><span>${fmt(n.prima)}</span></div>
+        <div class="nomina-row emp"><span>Vacaciones 4.17%</span><span>${fmt(n.vacaciones)}</span></div>
+        <div class="nomina-row" style="font-weight:700;color:var(--accent)"><span>COSTO TOTAL EMPRESA</span><span>${fmt(n.costo_empresa)}</span></div>
+      </div>
+    </div>`;
+  loadNomina();
+}
+
+// ── FINANZAS ─────────────────────────────────────────────────────────────────
+async function loadFinanzas(){
+  const data=await fetch('/api/finanzas').then(r=>r.json());
+  const ingresos=data.filter(c=>c.tipo==='ingreso').reduce((s,c)=>s+c.monto,0);
+  const egresos=data.filter(c=>c.tipo==='egreso').reduce((s,c)=>s+c.monto,0);
+  const saldo=ingresos-egresos;
+  $('kpi-finanzas').innerHTML=`
+    <div class="kpi"><div class="kpi-icon" style="background:#2ecc7122"><i class="fas fa-arrow-up" style="color:var(--green)"></i></div><div class="kpi-val" style="color:var(--green)">${fmt(ingresos)}</div><div class="kpi-label">Ingresos totales</div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:#e74c3c22"><i class="fas fa-arrow-down" style="color:var(--red)"></i></div><div class="kpi-val" style="color:var(--red)">${fmt(egresos)}</div><div class="kpi-label">Egresos totales</div></div>
+    <div class="kpi"><div class="kpi-icon" style="background:${saldo>=0?'#2ecc7122':'#e74c3c22'}"><i class="fas fa-balance-scale" style="color:${saldo>=0?'var(--green)':'var(--red)'}"></i></div><div class="kpi-val" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmt(saldo)}</div><div class="kpi-label">Saldo neto</div></div>`;
+  $('tb-finanzas').innerHTML=data.slice(0,60).map(c=>`<tr>
+    <td><code style="font-size:.78rem;color:var(--muted)">${c.id}</code></td>
+    <td><span class="badge ${c.tipo==='ingreso'?'badge-green':'badge-red'}">${c.tipo}</span></td>
+    <td>${c.concepto}</td>
+    <td style="font-weight:600;color:${c.tipo==='ingreso'?'var(--green)':'var(--red)'}">${fmt(c.monto)}</td>
+    <td style="color:var(--muted)">${c.fecha}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteItem('finanzas','${c.id}',loadFinanzas)"><i class="fas fa-trash"></i></button></td>
+  </tr>`).join('');
+}
+
+async function crearFinanza(){
+  const body={tipo:$('f-tipo').value,monto:$('f-monto').value,concepto:$('f-concepto').value};
+  if(!body.concepto||!body.monto){toast('Completa todos los campos','err');return}
+  await fetch('/api/finanzas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-finanza'); toast('Movimiento registrado'); loadFinanzas();
+}
+
+// ── CLIENTES ─────────────────────────────────────────────────────────────────
+async function loadClientes(){
+  const data=await fetch('/api/clientes').then(r=>r.json());
+  clientesCache=data;
+  $('tb-clientes').innerHTML=data.length===0
+    ? '<tr><td colspan="7"><div class="empty"><i class="fas fa-star"></i><p>Sin clientes registrados</p></div></td></tr>'
+    : data.map(c=>`<tr>
+      <td><code style="font-size:.78rem;color:var(--muted)">${c.id}</code></td>
+      <td><strong>${c.nombre}</strong></td><td>${c.telefono}</td><td>${c.email||'—'}</td>
+      <td><span class="badge badge-orange">${c.puntos} pts</span></td>
+      <td style="color:var(--muted)">${c.cumpleanos||'—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteItem('clientes','${c.id}',loadClientes)"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+async function crearCliente(){
+  const body={nombre:$('c-nombre').value,telefono:$('c-tel').value,
+    email:$('c-email').value,cumpleanos:$('c-cumple').value};
+  if(!body.nombre){toast('Nombre requerido','err');return}
+  await fetch('/api/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  closeModal('modal-cliente'); toast('Cliente registrado'); loadClientes();
+}
+
+// ── PROMOCIONES ──────────────────────────────────────────────────────────────
+async function loadPromociones(){
+  const data=await fetch('/api/promociones').then(r=>r.json());
+  if(!data.length){
+    $('promo-grid').innerHTML='<div class="empty"><i class="fas fa-tags"></i><p>Sin clientes con promociones disponibles</p></div>';
+    return;
+  }
+  const tipoClass={gold:'promo-gold',silver:'promo-silver',bronze:'promo-bronze',birthday:'promo-birthday',vip:'promo-vip'};
+  $('promo-grid').innerHTML=data.map(p=>`
+    <div class="promo-card">
+      <h4>${p.cliente}</h4>
+      <p>📞 ${p.telefono} · <span style="color:var(--accent)">${p.puntos} puntos</span></p>
+      ${p.promos.map(pr=>`<span class="promo-badge ${tipoClass[pr.tipo]||''}">${pr.texto}</span>`).join('')}
+    </div>`).join('');
+}
+
+// ── SIMULACIÓN ───────────────────────────────────────────────────────────────
+async function ejecutarSimulacion(){
+  const dias=parseInt($('sim-dias').value);
+  const btn=document.querySelector('#page-simulacion .btn-primary');
+  btn.innerHTML='<span class="spinner"></span> Simulando...';
+  btn.disabled=true;
+  const r=await fetch('/api/simular',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({dias})}).then(x=>x.json());
+  btn.innerHTML='<i class="fas fa-dice"></i> Ejecutar simulación';
+  btn.disabled=false;
+  $('sim-resultado').innerHTML=`
+    <div class="alert alert-ok">
+      <i class="fas fa-check-circle"></i>
+      <div>
+        <strong>Simulación completada: ${dias} días</strong><br>
+        Pedidos generados: <strong>${r.pedidos}</strong> · 
+        Ventas totales: <strong>${fmt(r.ventas)}</strong> · 
+        Promedio/día: <strong>${fmt(r.ventas/dias)}</strong>
+      </div>
+    </div>`;
+  toast(`Simulación de ${dias} días completada`);
+}
+
+// ── GENÉRICO DELETE ──────────────────────────────────────────────────────────
+async function deleteItem(tabla,id,reload){
+  if(!confirm('¿Desactivar este registro?')) return;
+  await fetch(`/api/${tabla}/${id}`,{method:'DELETE'});
+  toast('Registro eliminado'); reload();
+}
+
+// ── GUARDAR ──────────────────────────────────────────────────────────────────
+async function guardarDatos(){
+  await fetch('/api/guardar',{method:'POST'});
+  toast('Datos guardados correctamente');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>
